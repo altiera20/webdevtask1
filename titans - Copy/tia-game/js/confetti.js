@@ -3,7 +3,6 @@
  * Provides confetti animation for victory celebrations
  */
 
-// Confetti configuration
 const CONFETTI_CONFIG = {
     particleCount: 150,
     spread: 70,
@@ -12,8 +11,8 @@ const CONFETTI_CONFIG = {
 };
 
 /**
- * Creates a confetti particle element
- * @returns {HTMLElement} - The confetti particle element
+ * creating confetti particles that go BOOM
+
  */
 function createConfettiParticle() {
     const particle = document.createElement('div');
@@ -39,7 +38,7 @@ function createConfettiParticle() {
 }
 
 /**
- * Animates a confetti particle
+ * makes cinfetti BOOM
  * @param {HTMLElement} particle - The confetti particle to animate
  * @param {number} startX - Starting X position
  * @param {number} startY - Starting Y position
@@ -56,16 +55,15 @@ function animateConfettiParticle(particle, startX, startY) {
     particle.style.top = `${startY}px`;
     particle.style.zIndex = '9999';
     
-    // Apply animation
+  
     particle.style.transition = `all ${duration}s ease-out`;
     
-    // Start animation after a small delay to ensure transition works
     setTimeout(() => {
         particle.style.left = `${endX}px`;
         particle.style.top = `${endY}px`;
         particle.style.opacity = '0';
         
-        // Remove particle after animation completes
+        // REMOVES
         setTimeout(() => {
             if (particle.parentNode) {
                 particle.parentNode.removeChild(particle);
@@ -75,7 +73,7 @@ function animateConfettiParticle(particle, startX, startY) {
 }
 
 /**
- * Creates and launches confetti animation
+ * create n launch
  */
 function launchConfetti() {
     console.log('Launching confetti celebration!');
@@ -109,20 +107,17 @@ function launchConfetti() {
         const particle = createConfettiParticle();
         container.appendChild(particle);
         
-        // Calculate starting position
+        //  starting position
         const startX = Math.random() * window.innerWidth;
         const startY = CONFETTI_CONFIG.origin.y * window.innerHeight;
         
-        // Stagger animations slightly
         setTimeout(() => {
             animateConfettiParticle(particle, startX, startY);
         }, Math.random() * 500); // Stagger up to 0.5 seconds
     }
     
-    // Alert to confirm function was called
     alert('Confetti launched! If you don\'t see confetti, check the console for errors.');
     
-    // Remove container after all animations complete
     setTimeout(() => {
         if (container.parentNode) {
             container.parentNode.removeChild(container);
@@ -142,7 +137,7 @@ function testConfetti() {
 window.launchConfetti = launchConfetti;
 window.testConfetti = testConfetti;
 
-// Add a direct test trigger when the script loads
+// trigger
 console.log('Confetti.js loaded successfully!');
 
 // Add a global function to test if confetti is working

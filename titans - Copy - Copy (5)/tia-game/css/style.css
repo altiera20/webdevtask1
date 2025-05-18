@@ -1,4 +1,4 @@
-/* General Layout */
+
 * {
     margin: 0;
     padding: 0;
@@ -7,8 +7,8 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #2c3e50; /* Dark background */
-    color: #ecf0f1; /* Light text for better contrast */
+    background-color: #2c3e50; 
+    color: #ecf0f1; 
     display: flex;
     justify-content: center;
     padding: 20px;
@@ -28,87 +28,87 @@ body {
 
 h1 {
     margin-bottom: 30px;
-    color: #ecf0f1; /* Light color for heading */
+    color: #ecf0f1; 
 }
 
-/* Game Board - Hexagonal Grid */
+
 .game-board {
     position: relative;
-    width: 500px; /* Base size for desktop */
+    width: 500px;
     height: 500px;
     margin: 0 auto 30px;
-    /* border: 1px solid #34495e; /* Optional: if you want a faint border for the board */
+    /
     max-width: 100%;
-    max-height: 90vw; /* Make sure it doesn't overflow on mobile */
+    max-height: 90vw; 
 }
 
-/* SVG for lines */
+
 #edge-lines-svg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Ensure SVG doesn't interfere with node clicks */
-    z-index: 0; /* Place lines behind nodes */
+    pointer-events: none; 
+    z-index: 0; 
 }
 
 .edge-line {
-    stroke: #bdc3c7; /* Light grey for lines, similar to image */
-    stroke-width: 5px; /* Thicker lines as in image */
-    stroke-linecap: round; /* Rounded ends for lines */
+    stroke: #bdc3c7; 
+    stroke-width: 5px; 
+    stroke-linecap: round; 
 }
 
-/* Edge weight text styling */
+
 #edge-lines-svg text {
-    fill: #FFFFFF; /* White text */
+    fill: #FFFFFF; 
     font-size: 30px;
     font-family: Arial, sans-serif;
     text-anchor: middle;
     dominant-baseline: middle;
-    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.8)); /* Add shadow for better visibility */
-    pointer-events: none; /* Ensure text doesn't interfere with node clicks */
+    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.8)); 
+    pointer-events: none; 
 }
 
-/* Circuit Styles - No background needed, centers for positioning */
+
 .circuit {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    /* Remove background from circuits if they had any */
+    
 }
 
 #outer-circuit {
-    width: 480px; /* Adjusted for visual balance */
+    width: 480px; 
     height: 480px;
 }
 
 #middle-circuit {
-    width: 320px; /* Adjusted for visual balance */
+    width: 320px; 
     height: 320px;
 }
 
 #inner-circuit {
-    width: 160px; /* Adjusted for visual balance */
+    width: 160px; 
     height: 160px;
 }
 
-/* Node Styles */
+
 .node {
     position: absolute;
-    width: 30px; /* Smaller nodes like in the image */
+    width: 30px; 
     height: 30px;
     border-radius: 50%;
-    background-color: #34495e; /* Dark grey nodes, can be adjusted */
-    border: 4px solid #ecf0f1; /* Thick white border like in the image */
+    background-color: #34495e; 
+    border: 4px solid #ecf0f1; 
     transition: all 0.2s ease;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     transform: translate(-50%, -50%);
-    z-index: 10; /* Ensure nodes are above lines */
+    z-index: 10; 
 }
 
 .node:hover {
@@ -118,11 +118,11 @@ h1 {
 
 /* Node Positions - Outer Circuit */
 #outer-0 { top: 0%; left: 50%; }
-#outer-1 { top: 25%; left: 93.3%; } /* Adjusted for hexagon shape */
-#outer-2 { top: 75%; left: 93.3%; } /* Adjusted for hexagon shape */
+#outer-1 { top: 25%; left: 93.3%; } 
+#outer-2 { top: 75%; left: 93.3%; } 
 #outer-3 { top: 100%; left: 50%; }
-#outer-4 { top: 75%; left: 6.7%; }  /* Adjusted for hexagon shape */
-#outer-5 { top: 25%; left: 6.7%; }  /* Adjusted for hexagon shape */
+#outer-4 { top: 75%; left: 6.7%; } 
+#outer-5 { top: 25%; left: 6.7%; }  
 
 /* Node Positions - Middle Circuit */
 #middle-0 { top: 0%; left: 50%; }
@@ -142,22 +142,22 @@ h1 {
 
 /* Node States */
 .node.red-occupied {
-    background-color: #e74c3c; /* Red player */
-    border-color: #ecf0f1; /* Keep white border */
+    background-color: #e74c3c; 
+    border-color: #ecf0f1;
 }
 
 .node.blue-occupied {
-    background-color: #3498db; /* Blue player */
-    border-color: #ecf0f1; /* Keep white border */
+    background-color: #3498db; 
+    border-color: #ecf0f1; 
 }
 
 .node.selected {
-    box-shadow: 0 0 12px #f1c40f; /* Yellow glow for selected */
+    box-shadow: 0 0 12px #f1c40f;
     transform: translate(-50%, -50%) scale(1.2);
 }
 
 .node.valid-move {
-    background-color: #2ecc71; /* Green for valid moves */
+    background-color: #2ecc71; 
     border-color: #ecf0f1;
 }
 
@@ -166,7 +166,7 @@ h1 {
     opacity: 0.7;
 }
 
-/* Mobile Responsive Styles */
+
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -362,7 +362,7 @@ h1 {
 .scoreboard {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 10px; /* Reduced margin */
+    margin-bottom: 10px; 
 }
 
 .player-score {
@@ -382,7 +382,7 @@ h1 {
 }
 
 #red-titans, #blue-titans, #red-score, #blue-score, #game-timer, #turn-timer {
-    color: #ecf0f1; /* White for numbers */
+    color: #ecf0f1; 
 }
 
 .player-score.red {
@@ -661,10 +661,10 @@ animation: pulse 0.4s ease-in-out;
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* Developer helper text (if used) */
+
 .dev-text {
     font-size: 9px;
-    color: #7f8c8d; /* Muted color for dev text */
+    color: #7f8c8d; 
     position: absolute;
     top: 50%;
     left: 50%;

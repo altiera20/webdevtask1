@@ -1,34 +1,27 @@
-/**
- * replay.js
- * Implements game replay functionality using the game history
- */
 
-// Replay controller state
 const replayController = {
     isActive: false,
     currentStep: 0,
     totalSteps: 0,
     autoplayInterval: null,
-    autoplaySpeed: 1000, // milliseconds between steps
+    autoplaySpeed: 1000, 
     originalGameState: null,
     replayStates: []
 };
 
-// Store a reference to the original game state
+
 let originalGameState = null;
-// Store a reference to the original board state
+
 let originalBoardState = {};
 
-/**
- * Creates an initial game state for replay
- */
+
 function createInitialGameState() {
-    // Create a fresh game state for the beginning of the replay
+    
     const initialState = {
-        // Board state - tracks which nodes are occupied by which player
+        
         board: {},
         
-        // Player information
+        
         players: {
             red: { 
                 score: 0, 
@@ -42,26 +35,26 @@ function createInitialGameState() {
             }
         },
         
-        // Game flow control
+        
         currentPlayer: CONFIG.initialPlayerTurn,
         currentPhase: CONFIG.initialPhase,
         selectedNode: null,
         unlockedCircuits: [...CONFIG.initialUnlockedCircuits],
         
-        // Edge control and scoring
+        
         controlledEdges: {
             red: [],
             blue: []
         },
         
-        // Move history tracking
+        
         moveHistory: {
             red: [],
             blue: []
         }
     };
     
-    // Initialize board state - set all nodes to empty (null)
+    
     CONFIG.circuits.forEach(circuit => {
         for (let i = 0; i < CONFIG.nodesPerCircuit; i++) {
             const nodeId = `${circuit}-${i}`;
@@ -72,19 +65,16 @@ function createInitialGameState() {
     return initialState;
 }
 
-/**
- * Starts a replay of the current game
- */
 function startReplay() {
     console.log('Starting replay mode...');
     
-    // If already in replay mode, do nothing
+    
     if (replayController.isActive) {
         console.log('Already in replay mode, ignoring request');
         return;
     }
     
-    // Check if there's any history to replay
+    
     if (!gameHistory || gameHistory.length === 0) {
         alert('No game history available to replay. Play a game first!');
         console.log('No game history available');
@@ -93,31 +83,31 @@ function startReplay() {
     
     console.log(`Found ${gameHistory.length} states in game history`);
     
-    // Save the current game state to restore later
+    
     originalGameState = JSON.parse(JSON.stringify(gameState));
     
-    // Save the current board state
+    
     originalBoardState = {};
     for (const nodeId in gameState.board) {
         originalBoardState[nodeId] = gameState.board[nodeId];
     }
     
-    // Set up the replay states array
+    
     replayController.replayStates = [];
     
-    // Add all history states
+    
     for (let i = 0; i < gameHistory.length; i++) {
         replayController.replayStates.push(JSON.parse(JSON.stringify(gameHistory[i])));
     }
     
-    // Set up replay controller
+    
     replayController.isActive = true;
     replayController.currentStep = 0;
     replayController.totalSteps = replayController.replayStates.length - 1;
     
     console.log(`Replay setup with ${replayController.replayStates.length} states, totalSteps: ${replayController.totalSteps}`);
     
-    // Disable game controls during replay
+    
     const gameButtons = document.querySelectorAll('.game-controls button');
     gameButtons.forEach(button => {
         if (button.id !== 'replay-btn') {
@@ -125,26 +115,23 @@ function startReplay() {
         }
     });
     
-    // Show replay controls
+    
     showReplayControls();
     
-    // Load the first state
+    
     if (replayController.replayStates.length > 0) {
         loadReplayState(0);
     }
     
-    // Update status message
+    
     document.getElementById('status-message').textContent = 'Replay Mode: Step 0 of ' + replayController.totalSteps;
     
-    // Play sound effect
+    
     if (typeof playSound === 'function') {
         playSound('buttonClick');
     }
 }
 
-/**
- * Ends the replay and returns to the original game state
- */
 function endReplay() {
     console.log('Ending replay mode...');
     
@@ -153,28 +140,28 @@ function endReplay() {
         return;
     }
     
-    // Stop autoplay if active
+    
     stopAutoplay();
     
-    // Hide replay controls
+    
     hideReplayControls();
     
-    // Restore original game state
+    
     if (originalGameState) {
         console.log('Restoring original game state');
         
-        // First, clear all node classes to avoid visual glitches
+        
         document.querySelectorAll('.node').forEach(node => {
             node.classList.remove('red-occupied', 'blue-occupied', 'selected');
         });
         
-        // Restore the game state properties one by one to maintain references
+        
         gameState.currentPlayer = originalGameState.currentPlayer;
         gameState.currentPhase = originalGameState.currentPhase;
         gameState.selectedNode = originalGameState.selectedNode;
         gameState.unlockedCircuits = [...originalGameState.unlockedCircuits];
         
-        // Restore player information
+        
         gameState.players.red.score = originalGameState.players.red.score;
         gameState.players.red.titansPlaced = originalGameState.players.red.titansPlaced;
         gameState.players.red.titansRemaining = originalGameState.players.red.titansRemaining;
@@ -182,36 +169,36 @@ function endReplay() {
         gameState.players.blue.titansPlaced = originalGameState.players.blue.titansPlaced;
         gameState.players.blue.titansRemaining = originalGameState.players.blue.titansRemaining;
         
-        // Restore controlled edges
+        
         gameState.controlledEdges.red = [...originalGameState.controlledEdges.red];
         gameState.controlledEdges.blue = [...originalGameState.controlledEdges.blue];
         
-        // Restore move history
+        
         gameState.moveHistory.red = [...originalGameState.moveHistory.red];
         gameState.moveHistory.blue = [...originalGameState.moveHistory.blue];
         
-        // Restore the board state last
+        
         for (const nodeId in gameState.board) {
-            gameState.board[nodeId] = null; // Clear first
+            gameState.board[nodeId] = null; 
         }
         for (const nodeId in originalBoardState) {
             gameState.board[nodeId] = originalBoardState[nodeId];
         }
         
-        // Force a complete refresh of the board
+        
         if (typeof updateGridDisplay === 'function') {
             updateGridDisplay();
         } else {
-            // Fallback if the function isn't available
+            
             for (const nodeId in gameState.board) {
                 updateNodeDisplay(nodeId);
             }
         }
         
-        // Update the rest of the UI
+        
         updateUIFromState();
         
-        // Update move history display
+        
         if (typeof updateMoveHistoryDisplay === 'function') {
             updateMoveHistoryDisplay();
         }
@@ -219,26 +206,26 @@ function endReplay() {
         console.error('No original game state to restore!');
     }
     
-    // Reset replay controller
+    
     replayController.isActive = false;
     replayController.currentStep = 0;
     replayController.totalSteps = 0;
     replayController.replayStates = [];
     
-    // Clear the saved original states
+    
     originalGameState = null;
     originalBoardState = {};
     
-    // Re-enable game controls
+    
     const gameButtons = document.querySelectorAll('.game-controls button');
     gameButtons.forEach(button => {
         button.disabled = false;
     });
     
-    // Update status message
+    
     document.getElementById('status-message').textContent = 'Replay ended. You can continue your game now.';
     
-    // Play sound effect
+    
     if (typeof playSound === 'function') {
         playSound('buttonClick');
     }
@@ -246,10 +233,6 @@ function endReplay() {
     console.log('Replay mode ended successfully - game can be continued');
 }
 
-/**
- * Loads a specific state from the replay history
- * @param {number} stepIndex - Index of the step to load
- */
 function loadReplayState(stepIndex) {
     if (!replayController.isActive) {
         console.log('Not in replay mode, cannot load state');
@@ -263,46 +246,46 @@ function loadReplayState(stepIndex) {
     
     console.log(`Loading replay state ${stepIndex} of ${replayController.totalSteps}`);
     
-    // Update current step
+    
     replayController.currentStep = stepIndex;
     
-    // Load the state
+    
     const stateToLoad = replayController.replayStates[stepIndex];
     if (stateToLoad) {
-        // Clear the current board state first
+        
         for (const nodeId in gameState.board) {
             gameState.board[nodeId] = null;
         }
         
-        // Make a deep copy to avoid reference issues
+        
         gameState = JSON.parse(JSON.stringify(stateToLoad));
         
         console.log('Loaded board state:', gameState.board);
         
-        // Force a complete refresh of the board
+        
         try {
-            // First, clear all node classes
+            
             document.querySelectorAll('.node').forEach(node => {
                 node.classList.remove('red-occupied', 'blue-occupied', 'selected');
             });
             
-            // Then update each node based on the board state
+            
             for (const nodeId in gameState.board) {
                 const occupiedBy = gameState.board[nodeId];
                 const nodeElement = document.getElementById(nodeId);
                 
                 if (nodeElement) {
-                    // Remove existing occupation classes
+                    
                     nodeElement.classList.remove('red-occupied', 'blue-occupied', 'selected');
                     
-                    // Add the appropriate class if the node is occupied
+                    
                     if (occupiedBy === 'red') {
                         nodeElement.classList.add('red-occupied');
                     } else if (occupiedBy === 'blue') {
                         nodeElement.classList.add('blue-occupied');
                     }
                     
-                    // Add selected class if this is the selected node
+                    
                     if (nodeId === gameState.selectedNode) {
                         nodeElement.classList.add('selected');
                     }
@@ -327,13 +310,13 @@ function loadReplayState(stepIndex) {
         console.error(`Failed to load replay state at index ${stepIndex}`);
     }
     
-    // Update replay progress display
+    
     updateReplayProgress();
     
-    // Update status message with more detailed information
+    
     let statusText = `Replay Mode: Step ${stepIndex} of ${replayController.totalSteps}`;
     
-    // Add more context about the current state
+    
     if (stepIndex === 0) {
         statusText += ' - Initial board setup';
     } else {
@@ -343,9 +326,6 @@ function loadReplayState(stepIndex) {
     document.getElementById('status-message').textContent = statusText;
 }
 
-/**
- * Moves to the next step in the replay
- */
 function nextReplayStep() {
     if (!replayController.isActive) {
         return;
@@ -355,21 +335,18 @@ function nextReplayStep() {
     if (nextStep <= replayController.totalSteps) {
         loadReplayState(nextStep);
         
-        // Play sound effect
+        
         if (typeof playSound === 'function') {
             playSound('buttonClick');
         }
     } else {
-        // We've reached the end
+        
         if (replayController.autoplayInterval) {
-            stopAutoplay(); // Stop autoplay if we've reached the end
+            stopAutoplay(); 
         }
     }
 }
 
-/**
- * Moves to the previous step in the replay
- */
 function prevReplayStep() {
     if (!replayController.isActive) {
         return;
@@ -379,16 +356,13 @@ function prevReplayStep() {
     if (prevStep >= 0) {
         loadReplayState(prevStep);
         
-        // Play sound effect
+        
         if (typeof playSound === 'function') {
             playSound('buttonClick');
         }
     }
 }
 
-/**
- * Jumps to the first step in the replay
- */
 function firstReplayStep() {
     if (!replayController.isActive) {
         return;
@@ -402,9 +376,6 @@ function firstReplayStep() {
     }
 }
 
-/**
- * Jumps to the last step in the replay
- */
 function lastReplayStep() {
     if (!replayController.isActive) {
         return;
@@ -418,15 +389,12 @@ function lastReplayStep() {
     }
 }
 
-/**
- * Starts autoplay of the replay
- */
 function startAutoplay() {
     if (!replayController.isActive || replayController.autoplayInterval) {
         return;
     }
     
-    // If we're at the end, go back to the beginning
+    
     if (replayController.currentStep >= replayController.totalSteps) {
         loadReplayState(0);
     }
@@ -437,7 +405,7 @@ function startAutoplay() {
         if (nextStep <= replayController.totalSteps) {
             loadReplayState(nextStep);
         } else {
-            stopAutoplay(); // Stop when we reach the end
+            stopAutoplay(); 
         }
     }, replayController.autoplaySpeed);
     
@@ -453,9 +421,6 @@ function startAutoplay() {
     }
 }
 
-/**
- * Stops autoplay of the replay
- */
 function stopAutoplay() {
     if (!replayController.isActive || !replayController.autoplayInterval) {
         return;
@@ -472,9 +437,6 @@ function stopAutoplay() {
     }
 }
 
-/**
- * Toggles autoplay on/off
- */
 function toggleAutoplay() {
     if (!replayController.isActive) {
         return;
@@ -487,10 +449,6 @@ function toggleAutoplay() {
     }
 }
 
-/**
- * Sets the autoplay speed
- * @param {number} speed - Speed in milliseconds between steps
- */
 function setAutoplaySpeed(speed) {
     if (!replayController.isActive) {
         return;
@@ -509,13 +467,10 @@ function setAutoplaySpeed(speed) {
     updateSpeedDisplay();
 }
 
-/**
- * Updates the speed display
- */
 function updateSpeedDisplay() {
     const speedDisplay = document.getElementById('replay-speed-display');
     if (speedDisplay) {
-        // Convert milliseconds to a more readable format
+        
         let speedText = '';
         if (replayController.autoplaySpeed >= 2000) {
             speedText = (replayController.autoplaySpeed / 1000) + 's (Slow)';
@@ -531,26 +486,20 @@ function updateSpeedDisplay() {
     }
 }
 
-/**
- * Updates the replay progress display
- */
 function updateReplayProgress() {
     const progressBar = document.getElementById('replay-progress-bar');
     const progressText = document.getElementById('replay-progress-text');
     
     if (progressBar && progressText) {
-        // Update progress bar
+        
         const progressPercent = (replayController.currentStep / replayController.totalSteps) * 100;
         progressBar.style.width = progressPercent + '%';
         
-        // Update progress text
+        
         progressText.textContent = `${replayController.currentStep} / ${replayController.totalSteps}`;
     }
 }
 
-/**
- * Shows the replay controls UI
- */
 function showReplayControls() {
     console.log('Showing replay controls');
     
@@ -628,9 +577,6 @@ function showReplayControls() {
     updateReplayProgress();
 }
 
-/**
- * Hides the replay controls UI
- */
 function hideReplayControls() {
     const replayControls = document.getElementById('replay-controls');
     if (replayControls) {

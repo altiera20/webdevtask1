@@ -1,9 +1,4 @@
-/**
- * confetti.js
- * Provides confetti animation for victory celebrations
- */
 
-// Confetti configuration
 const CONFETTI_CONFIG = {
     particleCount: 150,
     spread: 70,
@@ -11,16 +6,13 @@ const CONFETTI_CONFIG = {
     colors: ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71', '#9b59b6', '#e67e22']
 };
 
-/**
- * Creates a confetti particle element
- * @returns {HTMLElement} - The confetti particle element
- */
+
 function createConfettiParticle() {
     const particle = document.createElement('div');
     particle.className = 'confetti-particle';
     
     // Random properties
-    const size = Math.random() * 10 + 5; // 5-15px
+    const size = Math.random() * 10 + 5; 
     const color = CONFETTI_CONFIG.colors[Math.floor(Math.random() * CONFETTI_CONFIG.colors.length)];
     const rotation = Math.random() * 360;
     const isCircle = Math.random() > 0.5;
@@ -38,17 +30,12 @@ function createConfettiParticle() {
     return particle;
 }
 
-/**
- * Animates a confetti particle
- * @param {HTMLElement} particle - The confetti particle to animate
- * @param {number} startX - Starting X position
- * @param {number} startY - Starting Y position
- */
+
 function animateConfettiParticle(particle, startX, startY) {
     // Random movement properties
-    const duration = Math.random() * 3 + 2; // 2-5 seconds
+    const duration = Math.random() * 3 + 2;
     const endX = startX + (Math.random() * CONFETTI_CONFIG.spread * 2 - CONFETTI_CONFIG.spread);
-    const endY = window.innerHeight + 100; // Ensure it goes off-screen
+    const endY = window.innerHeight + 100; 
     
     // Apply initial position
     particle.style.position = 'fixed';
@@ -59,7 +46,7 @@ function animateConfettiParticle(particle, startX, startY) {
     // Apply animation
     particle.style.transition = `all ${duration}s ease-out`;
     
-    // Start animation after a small delay to ensure transition works
+    
     setTimeout(() => {
         particle.style.left = `${endX}px`;
         particle.style.top = `${endY}px`;
@@ -74,9 +61,7 @@ function animateConfettiParticle(particle, startX, startY) {
     }, 10);
 }
 
-/**
- * Creates and launches confetti animation
- */
+
 function launchConfetti() {
     console.log('Launching confetti celebration!');
     
@@ -88,7 +73,7 @@ function launchConfetti() {
     container.style.left = '0';
     container.style.width = '100%';
     container.style.height = '100%';
-    container.style.pointerEvents = 'none'; // Don't interfere with user interaction
+    container.style.pointerEvents = 'none'; 
     container.style.zIndex = '9998';
     
     document.body.appendChild(container);
@@ -130,9 +115,7 @@ function launchConfetti() {
     }, 6000); // Slightly longer than the longest possible animation
 }
 
-/**
- * Test function to manually trigger confetti
- */
+
 function testConfetti() {
     console.log('Testing confetti animation...');
     launchConfetti();

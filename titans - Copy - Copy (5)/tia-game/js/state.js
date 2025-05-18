@@ -1,18 +1,13 @@
-/**
- * state.js
- * Manages the game state and provides functions to modify it
- */
 
-// Undo/Redo stacks
 const gameHistory = [];
 const redoStack = [];
 
-// Game state object
+
 const gameState = {
-    // Board state - tracks which nodes are occupied by which player
+    
     board: {},
     
-    // Player information
+    
     players: {
         red: { 
             score: 0, 
@@ -26,41 +21,38 @@ const gameState = {
         }
     },
     
-    // Game flow control
+    
     currentPlayer: null,
     currentPhase: null,
     selectedNode: null,
     unlockedCircuits: [],
     
-    // Edge control and scoring
+    
     controlledEdges: {
         red: [],
         blue: []
     },
     
-    // Move history tracking
+    
     moveHistory: {
         red: [],
         blue: []
     },
     
-    // Initialize move history display elements
+    
     moveHistoryElements: {
         red: null,
         blue: null
     }
 };
 
-// Deep copy utility for game state
+
 function deepCopyGameState(state) {
     return JSON.parse(JSON.stringify(state));
 }
 
-/**
- * Initializes the game state to starting values
- */
 function initializeGameState() {
-    // Initialize board state - set all nodes to empty (null)
+    
     CONFIG.circuits.forEach(circuit => {
         for (let i = 0; i < CONFIG.nodesPerCircuit; i++) {
             const nodeId = `${circuit}-${i}`;
@@ -68,7 +60,7 @@ function initializeGameState() {
         }
     });
     
-    // Reset player information
+    
     gameState.players.red.score = 0;
     gameState.players.red.titansPlaced = 0;
     gameState.players.red.titansRemaining = CONFIG.totalTitansPerPlayer;
@@ -77,93 +69,81 @@ function initializeGameState() {
     gameState.players.blue.titansPlaced = 0;
     gameState.players.blue.titansRemaining = CONFIG.totalTitansPerPlayer;
     
-    // Set initial game flow values
+    
     gameState.currentPlayer = CONFIG.initialPlayerTurn;
     gameState.currentPhase = CONFIG.initialPhase;
     gameState.selectedNode = null;
     gameState.unlockedCircuits = [...CONFIG.initialUnlockedCircuits];
     
-    // Clear controlled edges
+    
     gameState.controlledEdges.red = [];
     gameState.controlledEdges.blue = [];
     
-    // Initialize move history
+    
     gameState.moveHistory = {
         red: [],
         blue: []
     };
     
-    // Clear move history display
+    
     clearMoveHistoryDisplay();
     
-    // Update UI to reflect initial state
+    
     updateUIFromState();
     
-    // Clear history on new game
+    
     gameHistory.length = 0;
     redoStack.length = 0;
     gameHistory.push(deepCopyGameState(gameState));
     
-    // Force update of move history display
+    
     updateMoveHistoryDisplay();
 }
 
-/**
- * Updates the state when a titan is placed on a node
- * @param {string} nodeId - The ID of the node where the titan is placed
- */
 function updateStateForPlacement(nodeId) {
-    // Save current state to history before making a change
+    
     gameHistory.push(deepCopyGameState(gameState));
-    redoStack.length = 0; // Clear redo on new action
-    // Update board state
+    redoStack.length = 0; 
+    
     gameState.board[nodeId] = gameState.currentPlayer;
     
-    // Update player's titans count
+    
     gameState.players[gameState.currentPlayer].titansPlaced++;
     gameState.players[gameState.currentPlayer].titansRemaining--;
     
-    // Record this move in the history
+    
     addMoveToHistory(gameState.currentPlayer, `Placed titan at ${nodeId}`, 'placement');
     
-    // Check if we should unlock middle circuit
+    
     if (gameState.players.red.titansPlaced >= 2 && 
         gameState.players.blue.titansPlaced >= 2 && 
         !gameState.unlockedCircuits.includes('middle')) {
         gameState.unlockedCircuits.push('middle');
     }
     
-    // Check if we should unlock inner circuit
+    
     if (gameState.players.red.titansPlaced >= 3 && 
         gameState.players.blue.titansPlaced >= 3 && 
         !gameState.unlockedCircuits.includes('inner')) {
         gameState.unlockedCircuits.push('inner');
     }
     
-    // Check if placement phase is complete
-    console.log(`[updateStateForPlacement] Red titansPlaced: ${gameState.players.red.titansPlaced}, Blue titansPlaced: ${gameState.players.blue.titansPlaced}`);
-    // Phase switch logic moved to handlePlacementPhaseClick in gameLogic.js
-    // No phase switch here.
     
-    // Check for controlled edges after placement
+    console.log(`[updateStateForPlacement] Red titansPlaced: ${gameState.players.red.titansPlaced}, Blue titansPlaced: ${gameState.players.blue.titansPlaced}`);
+
     checkControlledEdges();
     
-    // Force update of move history display
+    
     updateMoveHistoryDisplay();
     
-    // Debug log the current move history
+    
     console.log('Current move history:', gameState.moveHistory);
 }
 
-/**
- * Updates the state when a titan is moved from one node to another
- * @param {string} fromNodeId - The ID of the source node
- * @param {string} toNodeId - The ID of the destination node
- */
 function updateStateForMovement(fromNodeId, toNodeId) {
-    // Save current state to history before making a change
+    
     gameHistory.push(deepCopyGameState(gameState));
-    redoStack.length = 0; // Clear redo on new action
+    redoStack.length = 0; 
     // Update board state
     gameState.board[toNodeId] = gameState.board[fromNodeId];
     gameState.board[fromNodeId] = null;
@@ -184,22 +164,16 @@ function updateStateForMovement(fromNodeId, toNodeId) {
     console.log('Current move history:', gameState.moveHistory);
 }
 
-/**
- * Switches to the next player's turn
- */
 function switchPlayer() {
     gameState.currentPlayer = gameState.currentPlayer === 'red' ? 'blue' : 'red';
-    gameState.selectedNode = null; // Clear any selection when switching players
+    gameState.selectedNode = null; 
 }
 
-/**
- * Undo the last move
- */
 function undoGameState() {
     if (gameHistory.length > 1) {
         console.log('Performing undo operation...');
         redoStack.push(deepCopyGameState(gameState));
-        gameHistory.pop(); // Remove current state
+        gameHistory.pop(); 
         const prevState = gameHistory[gameHistory.length - 1];
         
         // Log the board state before and after for debugging
@@ -216,10 +190,10 @@ function undoGameState() {
                 const nodeId = `${circuit}-${i}`;
                 const nodeElement = document.getElementById(nodeId);
                 if (nodeElement) {
-                    // First, remove ALL possible state classes
+                    
                     nodeElement.classList.remove('red-occupied', 'blue-occupied', 'selected', 'valid-move', 'invalid');
                     
-                    // Then add the correct class based on the restored state
+                    
                     const occupiedBy = gameState.board[nodeId];
                     if (occupiedBy) {
                         nodeElement.classList.add(`${occupiedBy}-occupied`);
@@ -231,27 +205,26 @@ function undoGameState() {
             }
         });
         
-        // Also update the move history display
+        
         updateMoveHistoryDisplay();
     }
 }
 
-// Redo the last undone move
 function redoGameState() {
     if (redoStack.length > 0) {
         console.log('Performing redo operation...');
         gameHistory.push(deepCopyGameState(gameState));
         const nextState = redoStack.pop();
         
-        // Log the board state before and after for debugging
+        
         console.log('Board state before redo:', JSON.stringify(gameState.board));
         
-        // Restore the next state
+        
         restoreGameState(nextState);
         
         console.log('Board state after redo:', JSON.stringify(gameState.board));
         
-        // Force a complete refresh of all nodes
+        
         CONFIG.circuits.forEach(circuit => {
             for (let i = 0; i < CONFIG.nodesPerCircuit; i++) {
                 const nodeId = `${circuit}-${i}`;
@@ -272,14 +245,14 @@ function redoGameState() {
             }
         });
         
-        // Also update the move history display
+        
         updateMoveHistoryDisplay();
     }
 }
 
-// Restore game state from a snapshot
+
 function restoreGameState(stateSnapshot) {
-    // Copy properties deeply
+    
     Object.keys(stateSnapshot).forEach(key => {
         if (typeof stateSnapshot[key] === 'object' && stateSnapshot[key] !== null) {
             gameState[key] = JSON.parse(JSON.stringify(stateSnapshot[key]));
@@ -288,18 +261,13 @@ function restoreGameState(stateSnapshot) {
         }
     });
     updateUIFromState();
-    // Force a full grid visual refresh to match the restored board
+    
     if (typeof updateGridDisplay === 'function') updateGridDisplay();
 }
 
-/**
- * Adds a move to the player's move history and updates the display
- * @param {string} player - The player ('red' or 'blue')
- * @param {string} moveDescription - Description of the move
- * @param {string} moveType - Type of move ('placement', 'movement', or 'elimination')
- */
+
 function addMoveToHistory(player, moveDescription, moveType) {
-    // Create a move object with timestamp
+    
     const move = {
         description: moveDescription,
         type: moveType,
@@ -307,10 +275,10 @@ function addMoveToHistory(player, moveDescription, moveType) {
         timestamp: new Date().toLocaleTimeString()
     };
     
-    // Log the move being added for debugging
+    
     console.log(`Adding move to history: Player=${player}, Type=${moveType}, Description=${moveDescription}`);
     
-    // Initialize move history if needed
+    
     if (!gameState.moveHistory) {
         gameState.moveHistory = { red: [], blue: [] };
     }
@@ -318,21 +286,18 @@ function addMoveToHistory(player, moveDescription, moveType) {
         gameState.moveHistory[player] = [];
     }
     
-    // Add to player's move history
+    
     gameState.moveHistory[player].push(move);
     
-    // Debug log the current state of move history
+    
     console.log('Current move history:', JSON.stringify(gameState.moveHistory, null, 2));
     
-    // Update the display
+    
     updateMoveHistoryDisplay();
 }
 
-/**
- * Updates the move history display in the UI
- */
 function updateMoveHistoryDisplay() {
-    // Use stored history elements from gameState
+    
     const redHistoryList = gameState.moveHistoryElements.red;
     const blueHistoryList = gameState.moveHistoryElements.blue;
     
@@ -341,19 +306,19 @@ function updateMoveHistoryDisplay() {
         return;
     }
     
-    // Clear current display
+    
     redHistoryList.innerHTML = '';
     blueHistoryList.innerHTML = '';
     
-    // Helper function to create move item
+    
     function createMoveItem(move, index, player) {
         const listItem = document.createElement('li');
         listItem.className = `move-item ${move.type}-move`;
         
-        // Create move type indicator with icon
+        
         const typeIndicator = document.createElement('span');
         typeIndicator.className = 'move-type';
-        let icon = '⚡'; // Default icon
+        let icon = '⚡'; 
         if (move.type === 'placement') icon = '➕';
         else if (move.type === 'movement') icon = '➡️';
         else if (move.type === 'elimination') icon = '❌';
@@ -424,16 +389,13 @@ function updateMoveHistoryDisplay() {
     console.log('Move history display updated');
 }
 
-/**
- * Clears the move history display
- */
 function clearMoveHistoryDisplay() {
     // Store the history elements in gameState
     gameState.moveHistoryElements.red = document.getElementById('red-history-list');
     gameState.moveHistoryElements.blue = document.getElementById('blue-history-list');
     
     if (!gameState.moveHistoryElements.red || !gameState.moveHistoryElements.blue) {
-        // If elements don't exist, create them
+        
         const redHistory = document.createElement('ul');
         redHistory.id = 'red-history-list';
         redHistory.className = 'history-list';
@@ -452,20 +414,11 @@ function clearMoveHistoryDisplay() {
     gameState.moveHistoryElements.blue.innerHTML = '';
 }
 
-/**
- * Helper function to get a key for an edge between two nodes
- * @param {string} node1 - First node ID
- * @param {string} node2 - Second node ID
- * @returns {string} - Standardized edge key
- */
 function getEdgeKey(node1, node2) {
     // Sort the nodes to ensure consistent edge keys
     return [node1, node2].sort().join('-');
 }
 
-/**
- * Updates UI elements to reflect the current game state
- */
 function updateUIFromState() {
     // Update player scores
     document.getElementById('red-score').textContent = gameState.players.red.score;

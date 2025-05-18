@@ -1,11 +1,4 @@
-/**
- * grid.js
- * Handles the rendering and updating of the game grid UI
- */
 
-/**
- * Initializes the grid UI elements and sets up event listeners for node interactions
- */
 function initializeGrid() {
     // Get all node elements
     const nodeElements = document.querySelectorAll('.node');
@@ -25,11 +18,7 @@ function initializeGrid() {
     drawEdgeLines();
 }
 
-/**
- * Calculates the center coordinates of a node relative to the game board.
- * @param {string} nodeId - The ID of the node.
- * @returns {{x: number, y: number}} - The x and y coordinates of the node's center.
- */
+
 function getNodeCenter(nodeId) {
     const nodeElement = document.getElementById(nodeId);
     const gameBoardElement = document.querySelector('.game-board');
@@ -49,9 +38,7 @@ function getNodeCenter(nodeId) {
     return { x, y };
 }
 
-/**
- * Draws lines between connected nodes on the SVG canvas.
- */
+
 function drawEdgeLines() {
     const svg = document.getElementById('edge-lines-svg');
     if (!svg) {
@@ -82,12 +69,10 @@ function drawEdgeLines() {
                 line.setAttribute('y2', center2.y);
                 line.classList.add('edge-line');
                 svg.appendChild(line);
-                // 2. Get the edge weight from CONFIG
-                // Ensure CONFIG.edgeWeights has entries for all edges in your new adjacencyList
-                // The keys in edgeWeights should also be sorted, e.g., "inner-0-middle-0"
+           
                 const edgeWeight = CONFIG.edgeWeights[edgeKey];
 
-                // Only display weight if it's defined (and not, say, 0 or null if you prefer)
+                
                 if (edgeWeight !== undefined) {
                     // 3. Calculate the midpoint of the edge for placing the text
                     const midX = (center1.x + center2.x) / 2;
@@ -124,8 +109,7 @@ function drawEdgeLines() {
                     textElement.setAttribute('font-family', 'Arial, sans-serif');
                     textElement.setAttribute('text-anchor', 'middle'); // Horizontally center the text
                     textElement.setAttribute('dominant-baseline', 'middle'); // Vertically center the text
-                    // Add a class if you want to style it further via CSS
-                    // textElement.classList.add('edge-weight-label');
+                
 
                     textElement.textContent = edgeWeight.toString();
                     svg.appendChild(textElement);
@@ -137,9 +121,7 @@ function drawEdgeLines() {
     console.log('Edge lines drawn.');
 }
 
-/**
- * Updates the visual appearance of all nodes based on current game state
- */
+
 function updateGridDisplay() {
     // For each node in the game state, update its display
     Object.keys(gameState.board).forEach(nodeId => {
@@ -150,10 +132,7 @@ function updateGridDisplay() {
     highlightUnlockedCircuits();
 }
 
-/**
- * Updates the visual appearance of a single node
- * @param {string} nodeId - The ID of the node to update
- */
+
 function updateNodeDisplay(nodeId) {
     const nodeElement = document.getElementById(nodeId);
     if (!nodeElement) return;
@@ -173,10 +152,6 @@ function updateNodeDisplay(nodeId) {
     }
 }
 
-/**
- * Highlights nodes that are valid moves from a selected node
- * @param {string} selectedNodeId - The ID of the selected node
- */
 function highlightValidMoves(selectedNodeId) {
     // Clear any existing highlights first
     clearAllHighlights();
@@ -208,9 +183,7 @@ function clearAllHighlights() {
     });
 }
 
-/**
- * Visually highlights the circuits that are unlocked for titan placement
- */
+
 function highlightUnlockedCircuits() {
     // First, remove highlighting from all circuits
     CONFIG.circuits.forEach(circuit => {
@@ -229,9 +202,6 @@ function highlightUnlockedCircuits() {
     });
 }
 
-/**
- * Visually highlights the edges controlled by players
- */
 function highlightControlledEdges() {
     // This is a placeholder for edge highlighting
     // Will be implemented in a future iteration when the visual representation
@@ -242,15 +212,12 @@ function highlightControlledEdges() {
     // console.log("Blue controlled edges:", gameState.controlledEdges.blue);
 }
 
-/**
- * Creates a visual effect for a successful move or placement
- * @param {string} nodeId - The ID of the node to animate
- */
+
 function animateNodeAction(nodeId) {
     const nodeElement = document.getElementById(nodeId);
     if (!nodeElement) return;
     
-    // Simple animation effect - add and remove a class
+    
     nodeElement.classList.add('animated');
     setTimeout(() => {
         nodeElement.classList.remove('animated');

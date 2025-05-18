@@ -1,27 +1,18 @@
-/**
- * leaderboard.js
- * Manages the game's leaderboard functionality using local storage
- */
 
-// Leaderboard configuration
 const LEADERBOARD_CONFIG = {
     storageKey: 'titans_leaderboard',
-    maxEntries: 10, // Maximum number of entries to store
-    defaultName: 'Player' // Default name for unnamed players
+    maxEntries: 10, 
+    defaultName: 'Player' 
 };
 
-/**
- * Represents the leaderboard data structure
- */
+
 class Leaderboard {
     constructor() {
         this.entries = [];
         this.loadFromStorage();
     }
     
-    /**
-     * Loads leaderboard data from local storage
-     */
+
     loadFromStorage() {
         try {
             const storedData = localStorage.getItem(LEADERBOARD_CONFIG.storageKey);
@@ -38,9 +29,7 @@ class Leaderboard {
         }
     }
     
-    /**
-     * Saves leaderboard data to local storage
-     */
+
     saveToStorage() {
         try {
             localStorage.setItem(LEADERBOARD_CONFIG.storageKey, JSON.stringify(this.entries));
@@ -49,17 +38,9 @@ class Leaderboard {
             console.error('Error saving leaderboard to storage:', error);
         }
     }
-    
-    /**
-     * Adds a new entry to the leaderboard
-     * @param {string} playerName - Name of the player
-     * @param {string} playerColor - Color of the player ('red' or 'blue')
-     * @param {number} score - Player's score
-     * @param {string} date - Date of the game
-     * @returns {boolean} - True if the entry was added to the top scores
-     */
+
     addEntry(playerName, playerColor, score, date) {
-        // Create new entry
+        
         const newEntry = {
             playerName: playerName || LEADERBOARD_CONFIG.defaultName,
             playerColor: playerColor,
@@ -67,21 +48,21 @@ class Leaderboard {
             date: date || new Date().toLocaleDateString()
         };
         
-        // Add to entries
+        
         this.entries.push(newEntry);
         
-        // Sort entries by score (highest first)
+        
         this.entries.sort((a, b) => b.score - a.score);
         
-        // Trim to max entries
+        
         if (this.entries.length > LEADERBOARD_CONFIG.maxEntries) {
             this.entries = this.entries.slice(0, LEADERBOARD_CONFIG.maxEntries);
         }
         
-        // Save updated leaderboard
+        
         this.saveToStorage();
         
-        // Return true if the new entry made it to the leaderboard
+        
         return this.entries.some(entry => 
             entry.playerName === newEntry.playerName && 
             entry.score === newEntry.score && 
@@ -89,28 +70,16 @@ class Leaderboard {
         );
     }
     
-    /**
-     * Gets the top N entries from the leaderboard
-     * @param {number} count - Number of entries to retrieve (default: all)
-     * @returns {Array} - Array of leaderboard entries
-     */
+
     getTopEntries(count = this.entries.length) {
         return this.entries.slice(0, count);
     }
-    
-    /**
-     * Clears all leaderboard entries
-     */
+
     clearLeaderboard() {
         this.entries = [];
         this.saveToStorage();
     }
-    
-    /**
-     * Checks if a score would make it onto the leaderboard
-     * @param {number} score - Score to check
-     * @returns {boolean} - True if the score would make it onto the leaderboard
-     */
+
     isHighScore(score) {
         if (this.entries.length < LEADERBOARD_CONFIG.maxEntries) {
             return true;
@@ -121,14 +90,11 @@ class Leaderboard {
     }
 }
 
-// Create global leaderboard instance
+
 const leaderboard = new Leaderboard();
 
-/**
- * Shows the leaderboard UI
- */
 function showLeaderboard() {
-    // Create leaderboard container if it doesn't exist
+    
     let leaderboardContainer = document.getElementById('leaderboard-container');
     
     if (!leaderboardContainer) {
@@ -137,7 +103,7 @@ function showLeaderboard() {
         document.body.appendChild(leaderboardContainer);
     }
     
-    // Style the container
+    
     leaderboardContainer.style.position = 'fixed';
     leaderboardContainer.style.top = '50%';
     leaderboardContainer.style.left = '50%';
@@ -154,7 +120,7 @@ function showLeaderboard() {
     leaderboardContainer.style.maxHeight = '80vh';
     leaderboardContainer.style.overflowY = 'auto';
     
-    // Create content
+    
     const entries = leaderboard.getTopEntries();
     
     leaderboardContainer.innerHTML = `
@@ -189,13 +155,10 @@ function showLeaderboard() {
         </div>
     `;
     
-    // Add event listener to close button
+    
     document.getElementById('close-leaderboard').addEventListener('click', hideLeaderboard);
 }
 
-/**
- * Hides the leaderboard UI
- */
 function hideLeaderboard() {
     const leaderboardContainer = document.getElementById('leaderboard-container');
     if (leaderboardContainer) {
@@ -203,19 +166,13 @@ function hideLeaderboard() {
     }
 }
 
-/**
- * Shows a form to enter player name for the leaderboard
- * @param {string} winner - The winning player ('red' or 'blue')
- * @param {number} score - The winning player's score
- * @param {Function} callback - Function to call after name is submitted
- */
 function showNameEntryForm(winner, score, callback) {
-    // Create form container
+    
     const formContainer = document.createElement('div');
     formContainer.id = 'name-entry-form';
     document.body.appendChild(formContainer);
     
-    // Style the container
+    
     formContainer.style.position = 'fixed';
     formContainer.style.top = '50%';
     formContainer.style.left = '50%';
@@ -228,7 +185,7 @@ function showNameEntryForm(winner, score, callback) {
     formContainer.style.zIndex = '1000';
     formContainer.style.textAlign = 'center';
     
-    // Create form content
+    
     formContainer.innerHTML = `
         <h2 style="margin-top: 0; color: ${winner === 'red' ? '#e74c3c' : '#3498db'};">New High Score!</h2>
         <p>You scored ${score} points.</p>
@@ -238,23 +195,23 @@ function showNameEntryForm(winner, score, callback) {
         </form>
     `;
     
-    // Add event listener to form
+    
     document.getElementById('player-name-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const playerName = document.getElementById('player-name').value.trim();
         formContainer.remove();
         
-        // Add to leaderboard
+        
         leaderboard.addEntry(playerName, winner, score);
         
-        // Call callback if provided
+        
         if (typeof callback === 'function') {
             callback();
         }
     });
 }
 
-// Export functions
+
 window.leaderboard = leaderboard;
 window.showLeaderboard = showLeaderboard;
 window.hideLeaderboard = hideLeaderboard;

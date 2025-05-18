@@ -1,18 +1,12 @@
-/**
- * main.js
- * Entry point for the game, sets up event listeners and orchestrates the modules
- */
 
-// Wait for DOM to be fully loaded before initializing
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing game...');
     
-    // Initialize sound system if available
+    
     if (typeof initSoundSystem === 'function') {
         initSoundSystem();
         
-        // Start playing background music after a short delay
-        // (Delay helps avoid browser autoplay restrictions)
+
         setTimeout(() => {
             if (typeof playBackgroundMusic === 'function') {
                 playBackgroundMusic();
@@ -20,28 +14,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Set up button event listeners
+    
     setupButtonListeners();
     
-    // Initialize the grid with node event listeners
+    
     initializeGrid();
     
-    // Set initial UI state
+    
     document.getElementById('status-message').textContent = "Press 'Start Game' to begin.";
     
-    // Add sound controls to the game interface
+    
     addSoundControls();
 });
 
-/**
- * Adds sound control buttons to the game interface
- */
+
 function addSoundControls() {
-    // Create sound control container
+    
     const soundControls = document.createElement('div');
     soundControls.className = 'sound-controls';
     
-    // Create mute toggle button
+    
     const muteButton = document.createElement('button');
     muteButton.id = 'toggle-sound';
     muteButton.innerHTML = '🔊 Sound: ON';
@@ -53,13 +45,13 @@ function addSoundControls() {
             setMuted(!isMuted);
         }
         
-        // Play button click sound if unmuting
+        
         if (isMuted && typeof playSound === 'function') {
             playSound('buttonClick');
         }
     });
     
-    // Create master volume slider
+    
     const volumeControl = document.createElement('div');
     volumeControl.className = 'volume-control';
     volumeControl.innerHTML = `
@@ -67,7 +59,7 @@ function addSoundControls() {
         <input type="range" id="volume-slider" min="0" max="100" value="50">
     `;
     
-    // Add event listener to volume slider
+    
     volumeControl.querySelector('#volume-slider').addEventListener('input', function() {
         const volume = this.value / 100;
         if (typeof setMasterVolume === 'function') {
@@ -75,11 +67,11 @@ function addSoundControls() {
         }
     });
     
-    // Create music controls
+    
     const musicControls = document.createElement('div');
     musicControls.className = 'music-controls';
     
-    // Create music volume slider
+    
     const musicVolumeControl = document.createElement('div');
     musicVolumeControl.className = 'volume-control';
     musicVolumeControl.innerHTML = `
@@ -87,7 +79,7 @@ function addSoundControls() {
         <input type="range" id="music-volume-slider" min="0" max="100" value="30">
     `;
     
-    // Add event listener to music volume slider
+    
     musicVolumeControl.querySelector('#music-volume-slider').addEventListener('input', function() {
         const volume = this.value / 100;
         if (typeof setMusicVolume === 'function') {
@@ -95,7 +87,7 @@ function addSoundControls() {
         }
     });
     
-    // Create music toggle button
+    
     const musicToggleButton = document.createElement('button');
     musicToggleButton.id = 'toggle-music';
     musicToggleButton.innerHTML = '🎵 Music: ON';
@@ -113,20 +105,20 @@ function addSoundControls() {
             }
         }
         
-        // Play button click sound
+        
         if (typeof playSound === 'function') {
             playSound('buttonClick');
         }
     });
     
-    // Add controls to container
+    
     soundControls.appendChild(muteButton);
     soundControls.appendChild(volumeControl);
     musicControls.appendChild(musicToggleButton);
     musicControls.appendChild(musicVolumeControl);
     soundControls.appendChild(musicControls);
     
-    // Add container to game interface
+    
     const gameInterface = document.querySelector('.game-interface');
     if (gameInterface) {
         gameInterface.appendChild(soundControls);
@@ -135,11 +127,9 @@ function addSoundControls() {
     console.log('Sound and music controls added to interface');
 }
 
-/**
- * Sets up event listeners for game control buttons
- */
+
 function setupButtonListeners() {
-    // Start Game button
+    
     const startGameBtn = document.getElementById('start-game');
     if (startGameBtn) {
         startGameBtn.addEventListener('click', function() {
@@ -150,7 +140,7 @@ function setupButtonListeners() {
         });
     }
     
-    // Reset Game button
+    
     const resetGameBtn = document.getElementById('reset-game');
     if (resetGameBtn) {
         resetGameBtn.addEventListener('click', function() {
@@ -161,7 +151,7 @@ function setupButtonListeners() {
         });
     }
     
-    // Toggle Timer button
+    
     const toggleTimerBtn = document.getElementById('toggle-timer');
     if (toggleTimerBtn) {
         toggleTimerBtn.addEventListener('click', function() {
@@ -172,7 +162,7 @@ function setupButtonListeners() {
         });
     }
     
-    // Undo button
+    
     const undoBtn = document.getElementById('undo-btn');
     if (undoBtn) {
         undoBtn.addEventListener('click', function() {
@@ -183,7 +173,7 @@ function setupButtonListeners() {
         });
     }
 
-    // Redo button
+    
     const redoBtn = document.getElementById('redo-btn');
     if (redoBtn) {
         redoBtn.addEventListener('click', function() {
@@ -194,7 +184,7 @@ function setupButtonListeners() {
         });
     }
     
-    // Leaderboard button
+    
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     if (leaderboardBtn) {
         leaderboardBtn.addEventListener('click', function() {
@@ -207,7 +197,7 @@ function setupButtonListeners() {
         });
     }
     
-    // Replay button
+    
     const replayBtn = document.getElementById('replay-btn');
     if (replayBtn) {
         replayBtn.addEventListener('click', function() {
@@ -245,9 +235,6 @@ function redoGame() {
     }
 }
 
-/**
- * Global event handler for handling key presses
- */
 document.addEventListener('keydown', function(event) {
     // Example: Press 'r' to reset the game
     if (event.key === 'r' && event.ctrlKey) {
@@ -260,10 +247,6 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-/**
- * Adds a CSS class to make nodes distinguishable during development
- * This is a helper function for development and can be removed in production
- */
 function addDevHelpers() {
     // Add circuit names as text inside first node of each circuit
     document.getElementById('outer-0').innerHTML = '<span class="dev-text">Outer</span>';
@@ -281,5 +264,4 @@ function addDevHelpers() {
     console.log('Development helpers added');
 }
 
-// Uncomment the line below during development to add visual node identifiers
-// document.addEventListener('DOMContentLoaded', addDevHelpers);
+

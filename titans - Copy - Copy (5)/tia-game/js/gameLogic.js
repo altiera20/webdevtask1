@@ -1,77 +1,64 @@
-/**
- * gameLogic.js
- * Contains the core game rules and logic for the hexagonal strategy game
- */
 
-/**
- * Starts a new game, initializing the game state and UI
- */
 function startGame() {
-    // Initialize game state
+    
     initializeGameState();
     
-    // Initialize grid UI
+    
     updateGridDisplay();
     
-    // Start timers
+    
     startOverallTimer(CONFIG.gameTimerDuration);
     startTurnTimer(CONFIG.turnTimerDuration);
     
-    // Enable controls
+    
     enableGameControls();
     
-    // Initialize move history display
+    
     if (typeof clearMoveHistoryDisplay === 'function') {
         clearMoveHistoryDisplay();
     }
     
-    // Play start game sound
+    
     if (typeof playSound === 'function') {
         playSound('startGame');
     }
     
-    // Update status message
+    
     const statusMessage = "Game started! Red player, place your titan on the outer circuit.";
     document.getElementById('status-message').textContent = statusMessage;
     console.log(statusMessage);
 }
 
-/**
- * Handles a click on a node based on the current game phase and state
- * @param {string} nodeId - The ID of the clicked node
- */
+
 function handleNodeClick(nodeId) {
     console.log(`Node clicked: ${nodeId}`);
     
-    // If game hasn't started yet, do nothing
+    
     if (!gameState.currentPlayer) {
         return;
     }
     
-    // Placement Phase Logic
+    
     if (gameState.currentPhase === 'placement') {
         handlePlacementPhaseClick(nodeId);
     }
-    // Movement Phase Logic
+    
     else if (gameState.currentPhase === 'movement') {
         handleMovementPhaseClick(nodeId);
     }
 }
 
-/**
- * Handles node clicks during the placement phase
- * @param {string} nodeId - The ID of the clicked node
- */
+
 function handlePlacementPhaseClick(nodeId) {
-    // Check if the placement is valid
+    
     if (isValidPlacement(nodeId)) {
         // Place titan on the node
         placeTitan(nodeId);
         
-        // Check and unlock the next circuit if conditions are met
+        
         checkAndUnlockNextCircuit(); 
         
-        // After placement, check if both players have placed all titans
+        
         const total = CONFIG.totalTitansPerPlayer;
         const redDone = gameState.players.red.titansPlaced >= total;
         const blueDone = gameState.players.blue.titansPlaced >= total;
@@ -93,14 +80,11 @@ function handlePlacementPhaseClick(nodeId) {
     } else {
         const statusMessage = "Invalid placement. Select an empty node on an unlocked circuit.";
         document.getElementById('status-message').textContent = statusMessage;
-        // console.log(statusMessage); // Logging from isValidPlacement gives more detail
+    
     }
 }
 
-/**
- * Handles node clicks during the movement phase
- * @param {string} nodeId - The ID of the clicked node
- */
+
 function handleMovementPhaseClick(nodeId) {
     // If no node is currently selected
     if (!gameState.selectedNode) {
@@ -128,9 +112,9 @@ function handleMovementPhaseClick(nodeId) {
             document.getElementById('status-message').textContent = statusMessage;
         }
     }
-    // If a node is already selected
+    
     else {
-        // Check if the clicked node is a valid move destination
+        
         if (isValidMove(gameState.selectedNode, nodeId)) {
             // Move the titan
             moveTitan(gameState.selectedNode, nodeId);
@@ -138,12 +122,11 @@ function handleMovementPhaseClick(nodeId) {
             // Update UI to reflect all changes from the move and score updates
             updateUIFromState(); 
             
-            // Reset turn timer and switch to the next player
-            // gameState.selectedNode is cleared in updateStateForMovement, which is called by moveTitan
+
             switchPlayer();
-            resetTurnTimer(); // Reset for the new player's turn
+            resetTurnTimer(); 
         }
-        // If clicked on the same node, deselect it
+        
         else if (nodeId === gameState.selectedNode) {
             gameState.selectedNode = null;
             clearAllHighlights();
@@ -153,7 +136,7 @@ function handleMovementPhaseClick(nodeId) {
             const statusMessage = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)} player, select a titan to move`;
             document.getElementById('status-message').textContent = statusMessage;
         }
-        // If clicked on an invalid destination
+        
         else {
             const statusMessage = "Invalid move. Titans can only move to adjacent empty nodes.";
             document.getElementById('status-message').textContent = statusMessage;
@@ -166,10 +149,7 @@ function handleMovementPhaseClick(nodeId) {
     }
 }
 
-/**
- * Places a titan on a node during the placement phase
- * @param {string} nodeId - The ID of the node to place the titan on
- */
+
 function placeTitan(nodeId) {
     // Update game state for placement
     updateStateForPlacement(nodeId);
@@ -203,11 +183,7 @@ function placeTitan(nodeId) {
     updateMoveHistoryDisplay();
 }
 
-/**
- * Moves a titan from one node to another during the movement phase
- * @param {string} fromNodeId - The ID of the source node
- * @param {string} toNodeId - The ID of the destination node
- */
+
 function moveTitan(fromNodeId, toNodeId) {
     // Update game state for movement
     updateStateForMovement(fromNodeId, toNodeId);
@@ -242,11 +218,6 @@ function moveTitan(fromNodeId, toNodeId) {
     console.log(`${gameState.currentPlayer} player moved a titan from ${fromNodeId} to ${toNodeId}`);
 }
 
-/**
- * Checks if a placement on a node is valid during the placement phase
- * @param {string} nodeId - The ID of the node to check
- * @returns {boolean} - True if the placement is valid, false otherwise
- */
 function isValidPlacement(nodeId) {
     console.log(`[isValidPlacement] Checking node: ${nodeId}`);
     
@@ -277,12 +248,7 @@ function isValidPlacement(nodeId) {
     return true;
 }
 
-/**
- * Checks if a move from one node to another is valid during the movement phase
- * @param {string} fromNodeId - The ID of the source node
- * @param {string} toNodeId - The ID of the destination node
- * @returns {boolean} - True if the move is valid, false otherwise
- */
+
 function isValidMove(fromNodeId, toNodeId) {
     // Source node must have the current player's titan
     if (gameState.board[fromNodeId] !== gameState.currentPlayer) {
@@ -303,10 +269,7 @@ function isValidMove(fromNodeId, toNodeId) {
     return true;
 }
 
-/**
- * Updates the game state after a titan is placed on a node.
- * @param {string} nodeId - The ID of the node.
- */
+
 function updateStateForPlacement(nodeId) {
     if (!nodeId) {
         console.error("updateStateForPlacement: nodeId is null/undefined.");
@@ -322,11 +285,6 @@ function updateStateForPlacement(nodeId) {
     checkControlledEdges();
 }
 
-/**
- * Updates the game state after a titan moves from one node to another.
- * @param {string} fromNodeId - The ID of the source node.
- * @param {string} toNodeId - The ID of the destination node.
- */
 function updateStateForMovement(fromNodeId, toNodeId) {
     if (!fromNodeId || !toNodeId) {
         console.error("updateStateForMovement: fromNodeId or toNodeId is null/undefined.");
@@ -338,20 +296,18 @@ function updateStateForMovement(fromNodeId, toNodeId) {
         return;
     }
 
-    gameState.board[toNodeId] = player;      // Move player to the new node
-    gameState.board[fromNodeId] = null;    // Empty the old node
-    gameState.selectedNode = null;         // Clear selection after move is committed
+    gameState.board[toNodeId] = player;     
+    gameState.board[fromNodeId] = null;    
+    gameState.selectedNode = null;         
 
     // Check for new controlled edges and update scores
     checkControlledEdges(); 
 }
 
-/**
- * Switches the current player and updates the game state for the new turn.
- */
+
 function switchPlayer() {
     gameState.currentPlayer = (gameState.currentPlayer === 'red') ? 'blue' : 'red';
-    // gameState.selectedNode = null; // Already cleared in updateStateForMovement or deselect logic
+    
 
     // Play switch player sound
     if (typeof playSound === 'function') {
@@ -378,12 +334,10 @@ function switchPlayer() {
     }
 
     console.log(`Switched to ${gameState.currentPlayer}'s turn. Phase: ${gameState.currentPhase}`);
-    // resetTurnTimer(); // This is called after switchPlayer in handleMovementPhaseClick and handlePlacementPhaseClick
+    
 }
 
-/**
- * Checks and updates controlled edges after a titan is placed or moved
- */
+
 function checkControlledEdges() {
     // Track previous scores and controlled edges
     const previousEdges = {
@@ -395,8 +349,7 @@ function checkControlledEdges() {
     gameState.controlledEdges.red = [];
     gameState.controlledEdges.blue = [];
 
-    // Helper to get canonical edge key for weight lookup, as CONFIG.edgeWeights might use sorted keys
-    // This local getEdgeKey is specifically for this function's context and might differ from global one if any.
+
     const getCanonicalEdgeKey = (node1, node2) => [node1, node2].sort().join('-');
 
     // Check all possible edges
@@ -451,18 +404,13 @@ function checkControlledEdges() {
         }
     });
 
-    highlightControlledEdges(); // Visually update controlled edges (if implemented)
+    highlightControlledEdges(); 
 }
 
-/**
- * Updates a player's score
- * @param {string} player - The player ('red' or 'blue')
- * @param {number} points - The number of points to add or subtract
- * @param {boolean} isAdding - True to add points, false to subtract
- */
+
 function updateScore(player, points, isAdding) {
     const currentScore = gameState.players[player].score;
-    // const validPoints = Math.max(0, points); // Temporarily removing this line for debugging
+    
     const newScore = currentScore + (isAdding ? points : -points); // Using points directly
 
     console.log(`[updateScore] Player: ${player}, PointsArg: ${points}, isAdding: ${isAdding}`);
@@ -488,16 +436,14 @@ function updateScore(player, points, isAdding) {
     checkWinConditions();
 }
 
-/**
- * Checks if any win conditions have been met
- */
+
 function checkWinConditions() {
     console.log('Checking win conditions...');
     
     // Check if inner circuit is fully occupied
     if (isInnerCircuitFull()) {
         console.log('INNER CIRCUIT IS FULL - Determining winner...');
-        // Calculate winner based on score
+        
         const redScore = gameState.players.red.score;
         const blueScore = gameState.players.blue.score;
         console.log(`Scores: Red=${redScore}, Blue=${blueScore}`);
@@ -525,10 +471,7 @@ function checkWinConditions() {
     }
 }
 
-/**
- * Checks if the inner circuit is fully occupied
- * @returns {boolean} - True if inner circuit is fully occupied, false otherwise
- */
+
 function isInnerCircuitFull() {
     const nodesPerCircuit = CONFIG.nodesPerCircuit;
     console.log(`Checking inner circuit fullness. Nodes per circuit: ${nodesPerCircuit}`);
@@ -546,12 +489,8 @@ function isInnerCircuitFull() {
     return true;
 }
 
-/**
- * Ends the game and declares a winner
- * @param {string} winner - The winning player ('red' or 'blue')
- */
 function endGame(winner) {
-    // Update status message
+    
     let statusMessage;
     if (winner === 'draw') {
         statusMessage = 'Game Over! The game ended in a draw!';
@@ -565,7 +504,7 @@ function endGame(winner) {
         playSound('endGame');
     }
     
-    // For actual wins (not draws), add special celebration effects
+    
     if (winner !== 'draw') {
         // Launch confetti celebration directly
         console.log('Attempting to launch confetti...');
@@ -606,7 +545,7 @@ function endGame(winner) {
                     // Just show the leaderboard
                     showLeaderboard();
                 }
-            }, 3000); // Show after 3 seconds to allow celebration effects to complete
+            }, 3000); 
         }
     }
     
@@ -640,9 +579,7 @@ function endGame(winner) {
     disableGameControls();
 }
 
-/**
- * Resets the game to starting state
- */
+
 function resetGame() {
     // Reset game state
     initializeGameState();
@@ -667,19 +604,12 @@ function resetGame() {
     disableGameControls();
 }
 
-/**
- * Enables game controls
- */
 function enableGameControls() {
-    // This is a placeholder for enabling game controls
-    // Will be implemented in a future iteration
+
     document.getElementById('reset-game').disabled = false;
     document.getElementById('toggle-timer').disabled = false;
 }
 
-/**
- * Disables game controls
- */
 function disableGameControls() {
     // Disable all game control buttons
     const buttons = document.querySelectorAll('.game-controls button');
@@ -692,20 +622,14 @@ function disableGameControls() {
     const nodes = document.querySelectorAll('.node');
     nodes.forEach(node => {
         node.style.pointerEvents = 'none';
-        node.style.opacity = '0.5'; // Make them visually indicate they're disabled
+        node.style.opacity = '0.5'; 
     });
 }
 
-/**
- * Checks game state and unlocks the next circuit in sequence if conditions are met.
- * Outer must be full to unlock Middle.
- * Middle must be full to unlock Inner.
- */
 function checkAndUnlockNextCircuit() {
     const currentlyUnlocked = gameState.unlockedCircuits;
 
-    // Try to unlock MIDDLE circuit
-    // Condition: 'outer' is filled AND 'middle' is not yet unlocked.
+
     if (currentlyUnlocked.includes('outer') && !currentlyUnlocked.includes('middle')) {
         let outerCircuitFilled = true;
         for (let i = 0; i < CONFIG.nodesPerCircuit; i++) {
@@ -723,7 +647,7 @@ function checkAndUnlockNextCircuit() {
                 playSound('unlockCircuit');
             }
             
-            // Update status message or UI if needed, e.g., through updateUIFromState() or a specific message.
+            
         }
     }
 
@@ -747,15 +671,6 @@ function checkAndUnlockNextCircuit() {
     }
 }
 
-/**
- * Checks for surrounded titans and eliminates them
- * A titan is considered surrounded if all adjacent nodes are occupied by opponent titans
- */
-/**
- * Displays a dramatic "TITAN ELIMINATED" message when a titan is eliminated
- * @param {string} nodeId - The ID of the node where the titan was eliminated
- * @param {string} player - The player whose titan was eliminated ('red' or 'blue')
- */
 function displayTitanEliminatedMessage(nodeId, player) {
     // Get the node's position for positioning the message
     const nodeElement = document.getElementById(nodeId);
@@ -855,7 +770,7 @@ function checkForSurroundedTitans() {
             }
         });
         
-        // A titan is surrounded if all adjacent nodes are occupied AND all are by the opponent
+        
         const isSurrounded = (opponentCount > 0) && (opponentCount === totalOccupied) && (opponentCount === adjacentNodes.length);
         
         // If surrounded, eliminate the titan
@@ -864,7 +779,7 @@ function checkForSurroundedTitans() {
             
             // Save current state to history before making a change
             gameHistory.push(deepCopyGameState(gameState));
-            redoStack.length = 0; // Clear redo stack on new action
+            redoStack.length = 0; 
             
             // Clear the node
             gameState.board[nodeId] = null;
@@ -880,14 +795,14 @@ function checkForSurroundedTitans() {
             
             // Play shotgun sound for elimination
             if (typeof playSound === 'function') {
-                playSound('eliminateTitan', 1.5); // Play shotgun sound at higher volume
+                playSound('eliminateTitan', 1.5); 
             }
             
             // Create and display a TITAN ELIMINATED message
             displayTitanEliminatedMessage(nodeId, occupiedBy);
             
             // Give points to the player who surrounded the titan
-            updateScore(opponent, 2, true); // Award 2 points for eliminating a titan
+            updateScore(opponent, 2, true);
             
             // Add to move history
             if (typeof addMoveToHistory === 'function') {
@@ -909,10 +824,10 @@ function checkForSurroundedTitans() {
             playSound('placeTitan');
         }
         
-        // Check for surrounded titans
+        
         checkForSurroundedTitans();
         
-        // Show message about eliminations
+         
         const message = eliminatedTitans.length === 1 ?
             `A titan was eliminated at ${eliminatedTitans[0].nodeId}!` :
             `${eliminatedTitans.length} titans were eliminated!`;
